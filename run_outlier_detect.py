@@ -16,7 +16,7 @@ import outlierdetect
 import numpy as np
 import pyarrow
 import pandas as pd
-import db_connect
+import sqlalchemy
 
 def generate_df_from_sql_query(table, cnx):
     """Returns a dataframe from specified SQL table.
@@ -31,13 +31,13 @@ def generate_df_from_sql_query(table, cnx):
         a dataframe containing the specified number of submissions for the given form.
 
     """
-    sql_query = ('SELECT * FROM "{table}"'.format(
+    sql_query = ('SELECT * FROM "outlier_detect"."{table}"'.format(
         table=table))
     df = pd.read_sql_query(sql_query, con=cnx)
 
     return df
 
-def filter_form_data_by_time(df, start_date, end_date):
+def filter_form_data_by_time(df, date):
     """Returns a dataframe filtered by a given time.
 
     Args:
@@ -53,7 +53,8 @@ def filter_form_data_by_time(df, start_date, end_date):
     df['started_time'] = pd.to_datetime(df['started_time'], format=date_format)
     df['completed_time'] = pd.to_datetime(df['completed_time'], format=date_format)
 
-    mask = (df['started_time'] >= start_date) & (df['started_time'] < end_date)
+    #mask = (df['started_time'] >= start_date) & (df['started_time'] < end_date)
+    mask = df['started_time'] < date
     df = df.loc[mask]
 
     return df
@@ -122,7 +123,7 @@ def format_scores(scores, df_form):
 
             # Format for dataframe.
             # Use i for user_id if needing to anonymize; otherwise (like for result analysis), use interviewer.
-            result = {"user_id": interviewer, "question": column, "score": scores[interviewer][column], "user_distribution": distribution_user, "N_user": n_user, "average_dwell_time_user": average_dwell_time_user, "total_distribution": distribution_total, "N_total": n_total, "average_dwell_time_total": average_dwell_time_total}
+            result = {"user_id": i, "question": column, "score": scores[interviewer][column], "user_distribution": distribution_user, "N_user": n_user, "average_dwell_time_user": average_dwell_time_user, "total_distribution": distribution_total, "N_total": n_total, "average_dwell_time_total": average_dwell_time_total}
             results.append(result)
 
         i += 1
@@ -132,24 +133,26 @@ def format_scores(scores, df_form):
 
 if __name__ == '__main__':
 
-    # Read in qualatative annotations to identify interesting questions to examine.
-    # df_annotations = pd.read_csv("annotations.csv")
-    # df_interesting_annotations = df_annotations.loc[df_annotations["hb outlier score"] > 1]
-
     # The db we want to connect to.
     db = settings.DB
-    cnx = db_connect.connect_to_sql()
+    cnx = sqlalchemy.create_engine(f'postgresql://{settings.POSTGRES_USERNAME}:{settings.POSTGRES_PASSWORD}@{settings.POSTGRES_ADDRESS}:{settings.POSTGRES_PORT}/{settings.POSTGRES_DBNAME}')
+
+    # Read in qualatative annotations to identify interesting questions to examine.
+    df_annotations = pd.read_csv('data/annotations/' + db + '.csv')
+    df_interesting_annotations = df_annotations.loc[df_annotations["hb outlier score"] > 1]
 
     # The specific form we want to examine for analysis.
     forms = settings.FORMS
 
     # Specify a start and end date to filter form data by time.
-    start_date = ''
-    end_date = ''
+    #start_date = ''
+    #date = '2020-07-01'
 
     for form in forms:
 
-        form_data_path = 'data/forms/' + form + '.gzip'
+        print("FORM: ", form)
+
+        form_data_path = 'data/forms/' + db + '/' + form + '.gzip'
 
         try:
             data = pd.read_parquet(form_data_path)
@@ -160,19 +163,21 @@ if __name__ == '__main__':
             # First time calls should save output in csv to eliminate need for future calls for the same data.
             data.to_parquet(form_data_path, compression='gzip', index=False)
 
-        # data = filter_form_data_by_time(data, start_date, end_date)
+        #data = filter_form_data_by_time(data, date)
         data = compute_dwell_time(data)
+
+        #print(data.head())
+        data = data[:20000]
+        print("SIZE: ", len(data))
 
         # The distinguishing username field for the algorithm.
         username = 'username'
         
         # Use given annotations to grab a list of questions to analyze, or manually enter specific question IDs.
-        # questions = list(df_interesting_annotations.loc[df_interesting_annotations["form_name"] == form]["question_id"])
-        questions = []
-        
+        questions = list(df_interesting_annotations.loc[df_interesting_annotations["form_name"] == form]["question_id"])
+        #print(questions)
         # Compute SVA outlier scores.
         try:
-            print("FORM: ", form)
 
             (sva_scores, agg_col_to_data) = outlierdetect.run_sva(data, username, questions)
 
@@ -181,7 +186,7 @@ if __name__ == '__main__':
             print(df_results.head())
             
             # Output to CSV.
-            output_filename = 'data/results/ ' + form + '.csv'
+            output_filename = 'data/results/' + db + '/' + form + '.csv'
             df_results.to_csv(output_filename, index=False)
             
         except Exception as err:

@@ -1,7 +1,6 @@
 # CommCare Outlier Detection
 ---
+
+Uses form submission data from CommCare to identify outliers using the following algorithm:
+
 Original Outlier Detect Repo by Ben Birnbaum: http://github.com/benb111/outlier-detect
-
-To run:
-
-python3 run_outlier_detect.py --settings=settings.sample_settings
