@@ -6,6 +6,12 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 
+def config_ipy():
+    """Start the script with this.
+    """
+    %load_ext autoreload
+    %autoreload 2
+
 def format_scores(scores):
     """Formats the interviewer outlier scores.
 
@@ -85,18 +91,12 @@ def assign_label(x, q):
     elif x <= q[4]:
         return 'Very Surprising'
     
-def get_sample(df, n):
-    """Grab a sample from a dataframe and reindex.
-    """
-
-    sample = df.sample(n = n)
-    sample.index = np.arange(1, len(sample) + 1)
-    return sample
-    
-def format_for_commcare(df):
+def format_for_commcare(df, n):
     """Format the dataframe to be as easy as possible to upload as a lookup to CommCare.
     # TODO: add index sheet!
     """
 
+    sample = df.sample(n = n)
+    sample.index = np.arange(1, len(sample) + 1)
     df.columns = ['field: ' + str(col) for col in df.columns]
     return df
