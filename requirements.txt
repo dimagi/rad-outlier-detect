@@ -1,4 +1,6 @@
 numpy==1.19.5
-outlierdetect @ git+https://github.com/dimagi/outlier-detect@8f44be6c328a8755a66173d1d93b7c38cf445519
+outlierdetect @ git+https://github.com/benb111/outlier-detect
 pandas==1.1.5
 scipy==1.5.4
+simple-settings==1.0.0
+

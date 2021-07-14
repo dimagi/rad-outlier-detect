@@ -6,11 +6,12 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 
-def config_ipy():
-    """Start the script with this.
-    """
-    %load_ext autoreload
-    %autoreload 2
+# If you're running the script through iPython, uncomment this function.
+# def config_ipy():
+#     """Start the script with this.
+#     """
+#     %load_ext autoreload
+#     %autoreload 2
 
 def format_scores(scores):
     """Formats the interviewer outlier scores.
