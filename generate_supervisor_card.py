@@ -27,7 +27,7 @@ from simple_settings import settings
 ## Generating Reports
 
 # %%
-df_results = pd.read_csv(settings.RESULTS_PATH)
+df_results = pd.read_csv('')
 outputs = []
 groupby_users = df_results.groupby('user')
 
