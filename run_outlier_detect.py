@@ -15,9 +15,10 @@ Runs Ben Birnbaum's outlier detection algorithm on a CommCare form submission da
 # %% [markdown]
 # ## Imports
 import helpers
+import matplotlib.pyplot as plt
 import pandas as pd
 from os import error
-import outlierdetect
+import outlier_detect
 from simple_settings import settings
 
 # %%
@@ -29,7 +30,7 @@ from simple_settings import settings
 # Load in a form from a CommCare project and pre-process it for a smooth run through the algorithm.
 
 # %%
-def run_algorithm(df_form, date=None):
+def run_algorithm(df_form, questions, date=None):
     """Runs the MMA algorithm on the given forms.
 
     Args:
@@ -37,14 +38,11 @@ def run_algorithm(df_form, date=None):
         date: if not empty, formats data for historical trend analysis.
     """
 
-    # Create a questions list without metadata and non-categorical columns.
-    questions = [col for col in df_form.columns if col not in settings.COLUMNS_TO_AVOID]
-
     # Clean and hash the dataframe.
-    df_form_cleaned = helpers.clean_form(df_form, questions)
+    df_form_cleaned = helpers.clean_form(df_form, settings.FORM_USER_ID, questions)
 
     # Run the MMA algorithm.
-    (mma_scores, _) = outlierdetect.run_mma(df_form_cleaned, settings.FORM_USER_ID, questions)
+    (mma_scores, _) = outlier_detect.run_mma(df_form_cleaned, settings.FORM_USER_ID, questions)
 
     # Format the scores for easy reading.
     df_results = helpers.format_scores(mma_scores, date)
@@ -55,7 +53,7 @@ def run_algorithm(df_form, date=None):
     return df_results
 
 # %%
-def find_historical_outliers(df_form):
+def find_historical_outliers(df_form, questions):
     """Runs the MMA algorithm on the given forms, filtered by given dates.
 
     Args:
@@ -64,30 +62,45 @@ def find_historical_outliers(df_form):
 
     df_historical = pd.DataFrame()
 
-    for date in settings.BY_DATE:
+    for dates in settings.DATES:
 
-        print("Date: ", date)
+        date_range = dates[0] + ' - ' + dates[1]
+        print(date_range)
 
-        df_form_by_date = helpers.filter_form_data_by_time(df_form, date)
+        df_form_by_date = helpers.filter_form_data_by_time(df_form, dates[0], dates[1])
 
-        df_results = run_algorithm(df_form_by_date, date)
+        df_results = run_algorithm(df_form_by_date, questions, dates[0])
 
-        df_results = df_results.groupby(['user', 'by_date'], as_index=False)['outlier_score'].median()
+        df_results = df_results.groupby(['user', 'date'], as_index=False)['outlier_score'].median()
 
         df_historical = df_historical.append(df_results)
 
-        return df_historical
+    df_historical['date'] = pd.to_datetime(df_historical['date'])
+    
+    # If you want to plot each user:
+    # df_historical.pivot_table(index='date', columns='user', values='outlier_score').plot(legend=False)
+
+    return df_historical
 
 # %%
 def main():
 
-    for form in settings.FORM:
-        print("FORM: ", form)
+    for form in settings.FORMS:
+        print("Form: ", form)
 
         df_form = helpers.read_commcare_form(settings.PROJECT_PATH, form, settings.POSTGRES_USERNAME, settings.POSTGRES_PASSWORD, settings.POSTGRES_ADDRESS, settings.POSTGRES_PORT, settings.POSTGRES_DBNAME)
 
-        df_historical = find_historical_outliers(form)
-        df_results = run_algorithm(form)
+        # Create a questions list without metadata and non-categorical columns.
+        questions = [col for col in df_form.columns if col not in settings.COLUMNS_TO_AVOID]
+
+        # If you already have previously run results, you can grab the list of questions from there so you don't have to annotate again.
+        questions = helpers.read_prev_results(settings.PROJECT, form)
+
+        # For historical trend analysis:
+        df_historical = find_historical_outliers(df_form, questions)
+
+        # For a normal run:
+        df_results = run_algorithm(df_form)
 
 if __name__ == "__main__":
     main()

@@ -30,12 +30,18 @@ def read_commcare_form(project_path, form, username=None, password=None, address
         a dataframe of the form.
 
     """
+
+    print("Reading form... ", end=' ')
+
     form_path = 'data/forms/' + form + '.gzip'
     
     try:
+
         df_form = pd.read_parquet(form_path)
+        print("Successfully read form from local path.")
 
     except FileNotFoundError:
+
         # Connect using given properties.
         cnx = sqlalchemy.create_engine(f'postgresql://{username}:{password}@{address}:{port}/{dbname}')
         sql_query = ('SELECT * FROM "{path}"."{table}"'.format(
@@ -44,9 +50,35 @@ def read_commcare_form(project_path, form, username=None, password=None, address
         # First time calls should save output in csv to eliminate need for future calls for the same data.
         df_form.to_parquet(form_path, compression='gzip', index=False)
 
+        print("Successfully downloaded form from server and saved to local path.")
+
     return df_form
 
-def clean_form(df_form, questions):
+def read_prev_results(project, form):
+    """Reads a previously run CommCare submission file's algorithm output. Useful to grab categorical questions that were previously annotated in case you want to run the algorithm on the form again.
+
+    Args:
+        project: the name of the project.
+        form: the name of the submission history file.
+
+    Returns:
+        a list of categorical questions.
+
+    """
+
+    print("Reading previous form results... ", end=' ')
+
+    results_path = 'data/results/' + project + '/' + form + '.csv'
+    
+    df_prev_results = pd.read_csv(results_path)
+
+    print("Successfully read previous results from local path.")
+
+    questions = list(set(df_prev_results['question']))
+
+    return questions
+
+def clean_form(df_form, user_id, questions):
     """Cleans a dataframe of a CommCare form by hashing usernames and filtering out non-categorical columns.
 
     Args:
@@ -57,12 +89,17 @@ def clean_form(df_form, questions):
         a cleaned and hashed dataframe of the form.
 
     """
-    columns_to_copy = ['owner_name'] + questions
-    df_form_cleaned = df_form[columns_to_copy].copy()
-    df_form_cleaned['username'] = df_form_cleaned['username'].apply(hash_string)
 
+    print("Cleaning form... ", end=' ')
+
+    columns_to_copy = [user_id] + questions
+    df_form_cleaned = df_form[columns_to_copy].copy()
+    #df_form_cleaned[user_id] = df_form_cleaned[user_id].apply(hash_string)
+    
     # Replace Nones with a value that can be subscriptable.
     df_form_cleaned = df_form_cleaned.fillna(value='missing')
+
+    print("Done.")
 
     return df_form_cleaned
 
@@ -76,6 +113,9 @@ def format_scores(scores, date=None):
         a dataframe with relevant columns displaying outlier score, corresponding labels, and frequencies.
 
     """
+
+    print("Formatting results... ", end=' ')
+
     results = []
 
     for interviewer in scores.keys():
@@ -88,7 +128,7 @@ def format_scores(scores, date=None):
             if date:
                 result = {"user": interviewer, 
                       "outlier_score": score,
-                      "by_date": date}
+                      "date": date}
             else:
                 result = {"user": interviewer, 
                       "question": column, 
@@ -112,6 +152,8 @@ def format_scores(scores, date=None):
     # Sort results.
     sort_parameter = 'user' if date else 'outlier_score'
     df_results = df_results.sort_values(by=[sort_parameter], ascending=False)
+
+    print("Done.")
     
     return df_results
 
@@ -165,7 +207,7 @@ def format_for_commcare(df, n):
     df.columns = ['field: ' + str(col) for col in df.columns]
     return df
 
-def filter_form_data_by_time(df, date):
+def filter_form_data_by_time(df, start_date, end_date):
     """Returns a dataframe filtered by a given time.
 
     Args:
@@ -179,7 +221,9 @@ def filter_form_data_by_time(df, date):
 
     date_format = '%Y-%m-%d %H:%M:%S'
     df['started_time'] = pd.to_datetime(df['started_time'], format=date_format)
-    mask = df['started_time'] < date
+    df['completed_time'] = pd.to_datetime(df['completed_time'], format=date_format)
+
+    mask = (df['started_time'] >= start_date) & (df['started_time'] < end_date)
     df = df.loc[mask]
 
     return df
