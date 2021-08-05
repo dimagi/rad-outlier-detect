@@ -3,3 +3,5 @@
 build/
 data/
 __pycache__
+outlier_detect.py
+settings.py

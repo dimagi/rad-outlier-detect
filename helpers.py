@@ -92,6 +92,9 @@ def clean_form(df_form, user_id, questions):
 
     print("Cleaning form... ", end=' ')
 
+    # For datetime calculations or if doing historical trend analysis.
+    df_form = convert_col_to_datetime(df_form)
+
     columns_to_copy = [user_id] + questions
     df_form_cleaned = df_form[columns_to_copy].copy()
     #df_form_cleaned[user_id] = df_form_cleaned[user_id].apply(hash_string)
@@ -122,23 +125,28 @@ def format_scores(scores, date=None):
         for column in scores[interviewer].keys():
             
             score = scores[interviewer][column]['score']
-            observed_frequencies = scores[interviewer][column]['observed_freq']
-            expected_frequencies = scores[interviewer][column]['expected_freq']
+            observed = scores[interviewer][column]['observed_freq']
+            expected = scores[interviewer][column]['expected_freq']
+            n_user = sum(observed.values())
+            n_total = sum(expected.values())
+            normalized_observed = normalize_value_counts(observed) if n_user != 0 else 0
+            normalized_expected = normalize_value_counts(expected) if n_total != 0 else 0
 
             if date:
                 result = {"user": interviewer, 
                       "outlier_score": score,
+                      "N_user": sum(observed.values()),
                       "date": date}
             else:
                 result = {"user": interviewer, 
                       "question": column, 
                       "outlier_score": score,
-                      "user_distribution": observed_frequencies,
-                      "total_distribution": expected_frequencies,
-                      "user_distribution_normalized": normalize_value_counts(observed_frequencies),
-                      "total_distribution_normalized": normalize_value_counts(expected_frequencies),
-                      "N_user": sum(observed_frequencies.values()), 
-                      "N_total": sum(expected_frequencies.values())}
+                      "user_distribution": observed,
+                      "total_distribution": expected,
+                      "user_distribution_normalized": normalized_observed,
+                      "total_distribution_normalized": normalized_expected,
+                      "N_user": n_user, 
+                      "N_total": n_total}
             
             results.append(result)
             
@@ -171,16 +179,6 @@ def normalize_value_counts(frequencies):
         normalized_frequencies[r] = round(100 * frequencies[r] / float(n), 1)
     return normalized_frequencies  
 
-# 
-def calc_p_value(x1, x2):
-    """We need to do a chi squared test to get a p-value for the distributions.
-    We have an observed distribution, but the expected
-    distribution needs to be calculated based on the percentage value counts.
-    """
-    x1_num = [k[1] for k in x1]
-    x2_num = [k[1] for k in x2]
-    return stats.chisquare(x1_num, x2_num)[1]
-
 def assign_label(x, q):
     """Assigns labels to quartiles in a dataset.
 
@@ -207,12 +205,11 @@ def format_for_commcare(df, n):
     df.columns = ['field: ' + str(col) for col in df.columns]
     return df
 
-def filter_form_data_by_time(df, start_date, end_date):
-    """Returns a dataframe filtered by a given time.
+def convert_col_to_datetime(df):
+    """Returns a dataframe with the relevant columns converted to the proper datetime format.
 
     Args:
         df: the dataframe to analyze.
-        time: the time to filter by.
 
     Returns:
         the same dataframe filtered by a given time.
@@ -222,6 +219,21 @@ def filter_form_data_by_time(df, start_date, end_date):
     date_format = '%Y-%m-%d %H:%M:%S'
     df['started_time'] = pd.to_datetime(df['started_time'], format=date_format)
     df['completed_time'] = pd.to_datetime(df['completed_time'], format=date_format)
+
+    return df
+
+def filter_form_data_by_time(df, start_date, end_date):
+    """Returns a dataframe filtered by a given time.
+
+    Args:
+        df: the dataframe to analyze.
+        start_date: the start_date to filter by.
+        end_date: the end_date to filter by.
+
+    Returns:
+        the same dataframe filtered by a given time.
+
+    """
 
     mask = (df['started_time'] >= start_date) & (df['started_time'] < end_date)
     df = df.loc[mask]
