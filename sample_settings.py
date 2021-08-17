@@ -9,12 +9,14 @@ FORMS = ['']
 # ex. 'username'
 FORM_USER_ID = ''
 
-# A list of question IDs to avoid running the algorithm on.
-# It is recommended to add metadata columns and non-categorical questions here. A few have been pre-added that are common metadata properties in CommCare.
-# Ex. ['cough', 'pregancy_check']
-COLUMNS_TO_AVOID = ['id', 'app_id', 'received_on', 'formid']
+# A list of survey responses to avoid, like blanks.
+# Ex. ['missing', ' ']
+AVOID_RESPONSES = []
 
-# Specify stard and end dates to filter form data by time.
+# In order to weed out non-categorical questions, establish a limit to the number of answer choices a question can have before we consider it continuous/non-categorical.
+ANSWER_LIMIT = 4
+
+# Specify stary and end dates to filter form data by time.
 # Ex. [('2019-01-01', '2019-04-01')]
 DATES = []
 

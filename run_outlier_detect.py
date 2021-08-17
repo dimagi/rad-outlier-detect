@@ -7,36 +7,17 @@ flalani@dimagi.com
 Runs Ben Birnbaum's outlier detection algorithm on a CommCare form submission dataset and formats it with frequency data.
 """
 
-# %% [markdown]
-# # Run Outlier Detect
-# ### Faisal M. Lalani
-# ---
-
-# %% [markdown]
-# ## Imports
-import datetime as dt
 import helpers
-import matplotlib.pyplot as plt
 import pandas as pd
-import numpy as np
-from os import error
 import outlier_detect
 from simple_settings import settings
 
-# %%
-# Uncomment if running as an iPython script.
-# helpers.config_ipy()
-
-# %% [markdown]
-# ## CommCare Data
-# Load in a form from a CommCare project and pre-process it for a smooth run through the algorithm.
-
-# %%
 def run_algorithm(df_form, questions, date=None):
     """Runs the MMA algorithm on the given forms.
 
     Args:
-        form: the dataframe of the form to run the algorithm on.
+        df_form: the dataframe of the form to run the algorithm on.
+        questions: the list of questions to use for the algorithm.
         date: if not empty, formats data for historical trend analysis.
 
     Returns:
@@ -44,7 +25,7 @@ def run_algorithm(df_form, questions, date=None):
     """
 
     # Run the MMA algorithm.
-    (mma_scores, _) = outlier_detect.run_mma(df_form, settings.FORM_USER_ID, questions)
+    (mma_scores, _) = outlier_detect.run_mma(df_form, settings.FORM_USER_ID, questions, null_responses=settings.AVOID_RESPONSES)
 
     # Format the scores for easy reading.
     df_results = helpers.format_scores(mma_scores, date)
@@ -82,6 +63,7 @@ def find_historical_outliers(df_form, questions):
 
         # Sort by median outlier score.
         df_results = df_results.sort_values(by=['outlier_score'], ascending=False)
+        df_results = df_results.reset_index(drop=True)
     
         # Use the index to create a rank for each user.
         df_results['rank'] = df_results.index
@@ -89,44 +71,12 @@ def find_historical_outliers(df_form, questions):
         # Add the results to the full output dataset.
         df_historical = df_historical.append(df_results)
 
+    # Convert date column to datetime format.
     df_historical['date'] = pd.to_datetime(df_historical['date'])
-    
-    # If you want to plot each user:
-    #df_historical.pivot_table(index='date', columns='user', values='score_label')
-    #.plot(legend=False)
-    #plt.savefig('users.png')
 
     return df_historical
 
-def compute_correlations(df_form, df_results):
-    """Runs the MMA algorithm on the given forms.
 
-    Args:
-        df_form: the dataframe of the form the algorithm ran on.
-        df_results: the formatted output the algorithm returned.
-
-    Returns:
-        a dataframe of users with their average scores and other factors to correlate scores with.
-    """
-
-    # Group users by their median score.
-    df_users = pd.DataFrame(df_results.groupby(['user'], as_index=True)['outlier_score'].median())
-
-    # Create a dwell time column and group users by it.
-    df_form['dwell_time'] = (df_form['completed_time'] - df_form['started_time']).dt.total_seconds()
-    df_dwell_time = pd.DataFrame(df_form.groupby(['username'], as_index=True)['dwell_time'].median())
-
-    # Merge the results together.
-    df_users = df_users.merge(df_dwell_time, left_index=True, right_index=True, how='inner')
-
-    # To add a correlation for a form property, use this:
-    form_property = ''
-    # df_property= pd.DataFrame(df_form.groupby(['username', 'form_property']).size().unstack(fill_value=0))  
-    # df_users = df_users.merge(df_property, left_index=True, right_index=True, how='inner')
-
-    return df_users
-
-# %%
 def main():
 
     for form in settings.FORMS:
@@ -135,26 +85,16 @@ def main():
         df_form = helpers.read_commcare_form(settings.PROJECT_PATH, form, settings.POSTGRES_USERNAME, settings.POSTGRES_PASSWORD, settings.POSTGRES_ADDRESS, settings.POSTGRES_PORT, settings.POSTGRES_DBNAME)
 
         # Create a questions list without metadata and non-categorical columns.
-        questions = [col for col in df_form.columns if col not in settings.COLUMNS_TO_AVOID]
-
-        # If you already have previously run results, you can grab the list of questions from there so you don't have to annotate again.
-        # questions = helpers.read_prev_results(settings.PROJECT, form)
+        questions = [col for col in df_form.columns if len(df_form[col].value_counts()) <= settings.ANSWER_LIMIT]
 
         # Clean and hash the dataframe.
         df_form_cleaned = helpers.clean_form(df_form, settings.FORM_USER_ID, questions)
 
-        # For historical trend analysis:
-        #df_historical = find_historical_outliers(df_form, questions)
-
         # For a normal run:
         df_results = run_algorithm(df_form_cleaned, questions)
 
-        # Add a column for average dwell time:
-        df_correlations = compute_correlations(df_form, df_results)
-    
-        # Save the results.
-        df_correlations.to_csv('data/results/' + form + '.csv', index=False)
+        # For historical trend analysis:
+        #df_historical = find_historical_outliers(df_form, questions)
 
-# %%
 if __name__ == "__main__":
     main()
