@@ -96,5 +96,7 @@ def main():
         # For historical trend analysis:
         #df_historical = find_historical_outliers(df_form, questions)
 
+        df_results.to_csv('results.csv')
+
 if __name__ == "__main__":
     main()
