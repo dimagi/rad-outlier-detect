@@ -5,46 +5,6 @@ import hashlib
 import numpy as np
 import pandas as pd
 from scipy import stats
-import sqlalchemy
-
-def read_commcare_form(project_path, form, username=None, password=None, address=None, port=None, dbname=None):
-    """Reads a CommCare project's form's submission history file.
-
-    Args:
-        project_path: the location of the table.
-        form: the name of the submission history file.
-        username: PostGres username
-        password: PostGres password
-        address: PostGres address
-        port: PostGres port
-        dbname: PostGres database name
-
-    Returns:
-        a dataframe of the form.
-    """
-
-    print("Reading form... ", end=' ')
-
-    form_path = 'data/forms/' + form + '.gzip'
-    
-    try:
-
-        df_form = pd.read_parquet(form_path)
-        print("Successfully read form from local path.")
-
-    except FileNotFoundError:
-
-        # Connect using given properties.
-        cnx = sqlalchemy.create_engine(f'postgresql://{username}:{password}@{address}:{port}/{dbname}')
-        sql_query = ('SELECT * FROM "{path}"."{table}"'.format(
-            path=project_path, table=form))
-        df_form = pd.read_sql_query(sql_query, con=cnx)
-        # First time calls should save output in csv to eliminate need for future calls for the same data.
-        df_form.to_parquet(form_path, compression='gzip', index=False)
-
-        print("Successfully downloaded form from server and saved to local path.")
-
-    return df_form
 
 def clean_form(df_form, user_id, questions):
     """Cleans a dataframe of a CommCare form by hashing usernames and filtering out non-categorical columns.

@@ -32,7 +32,6 @@ def run_algorithm(df_form, questions, date=None):
 
     return df_results
 
-# %%
 def find_historical_outliers(df_form, questions):
     """Runs the MMA algorithm on the given forms, filtered by given dates.
 
@@ -82,10 +81,11 @@ def main():
     for form in settings.FORMS:
         print("Form: ", form)
 
-        df_form = helpers.read_commcare_form(settings.PROJECT_PATH, form, settings.POSTGRES_USERNAME, settings.POSTGRES_PASSWORD, settings.POSTGRES_ADDRESS, settings.POSTGRES_PORT, settings.POSTGRES_DBNAME)
+        form_path = 'data/forms/' + form + '.gzip'
+        df_form = pd.read_parquet(form_path)
 
         # Create a questions list without metadata and non-categorical columns.
-        questions = [col for col in df_form.columns if len(df_form[col].value_counts()) <= settings.ANSWER_LIMIT]
+        questions = [col for col in df_form.columns if len(set(df_form[col])) <= settings.ANSWER_LIMIT]
 
         # Clean and hash the dataframe.
         df_form_cleaned = helpers.clean_form(df_form, settings.FORM_USER_ID, questions)

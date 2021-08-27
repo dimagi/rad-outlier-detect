@@ -16,7 +16,7 @@ AVOID_RESPONSES = []
 # In order to weed out non-categorical questions, establish a limit to the number of answer choices a question can have before we consider it continuous/non-categorical.
 ANSWER_LIMIT = 4
 
-# Specify stary and end dates to filter form data by time.
+# Specify start and end dates to filter form data by time.
 # Ex. [('2019-01-01', '2019-04-01')]
 DATES = []
 
