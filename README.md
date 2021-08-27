@@ -63,16 +63,6 @@ pip install -r requirements.txt
 python3 run_outlier_detect.py --settings=sample_settings
 ```
 
-5. To save the output above, you can add a line underneath the run code to generate a csv of the results to the path of your choice, as below:
-
-```py
-    # This is already in the script:
-    df_results = run_algorithm(df_form_cleaned, questions)
-    
-    # You can insert this line to save the results:
-    df_results.to_csv('results.csv')
-```
-
 6. Using the saved output of this primary script, you can run **generate_supervisor_card.py** to create a spreadsheet that contains formatted cells that allow CommCare to easily read the algorithm results and generate intuitive Supervisor Cards. These cards contain the top 3 highest scored questions for every interviewer, presenting their surprising behavior in easy-to-read statements.
 
 ```bash
