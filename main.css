@@ -1,10 +1,15 @@
+html,
+body,
+.container {
+  height: 100%;
+  position: relative;
+}
+
 body {
     background: #EEEEEE;
     width: 100%;
-    padding: 15% 5%;
 }
 
 .card {
-
-    margin: 5% 15%;
+    margin: 3% 0;
 }
