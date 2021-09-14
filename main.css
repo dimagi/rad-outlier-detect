@@ -35,3 +35,15 @@ body {
     width: 100%;
     object-fit: cover;
 }
+
+.clear-float {
+    clear: both;
+}
+
+.align-left {
+    float: left;
+}
+
+.align-right {
+    float: right;
+}
