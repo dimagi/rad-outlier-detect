@@ -10,6 +10,23 @@ body {
     width: 100%;
 }
 
+.btn {
+    font-size: unset;
+}
+
+.btn-link {
+    color: white;
+    text-decoration: none;
+}
+
+.btn-link:hover {
+    color: white;
+}
+
+.btn::selection{
+    border: none;
+}
+
 .card {
     margin: 3% 0;
 }
