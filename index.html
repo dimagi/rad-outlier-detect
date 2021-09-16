@@ -52,7 +52,7 @@
             <div class="card-header bg-danger text-white clear-float">
               <h6 class="mb-0 align-left">
                 <button class="btn btn-link" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                  Anomalous Patterns in Data ▼
+                  Anomalous Behavior in Data <span id='arrowOne'>▼</span>
                 </button>
               </h6>
               <h7 class="align-right">
@@ -61,12 +61,15 @@
             </div>
             <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-bs-parent="#accordion">
               <div class="card-body">
-                <p class="card-text">‘flu_symptoms_exist’: answered ‘no’ 95% compared to average of 16% <strong>[Very Surprising]</strong>.</p>
-                <p class="card-text">'hospitalized': answered ‘no’ 34% compared to average of 62% <strong>[Surprising]</strong>.</p>
-                <p class="card-text">'pregnancy_check': answered ‘yes’ 49% compared to average of 70% <strong>[Surprising]</strong>.</p>
+                <h5 class="card-title">What method was suggested for family planning?</h5>
+                <p class="card-text">The CHW selected "implants" 88.6% of the times compared to 25.9% for the average user <strong>[Very Surprising]</strong>.</p>
+                <h5 class="card-title">What implant type was used?</h5>
+                <p class="card-text">The CHW had missing values 11.4% of the time compared to 74.1% for the average user <strong>[Surprising]</strong>.</p>
+                <h5 class="card-title">Was a Family Planning referral made?</h5>
+                <p class="card-text">The CHW selected yes 90.9% compared to 43.4% for the average user <strong>[Surprising]</strong>.</p>
               </div>
               <div class="card-footer">
-                April - July
+                April 2021 - July 2021
               </div>
             </div>
           </div>
@@ -79,7 +82,7 @@
             <div class="card-header text-white bg-success">
               <h6 class="mb-0 align-left">
                 <button class="btn btn-link collapsed" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                  Submission Duration Trends ▼
+                  Anomalous Behavior in Submission Time <span id='arrowTwo'>▼</span>
                 </button>
               </h6>
               <h7 class="align-right">
@@ -88,12 +91,15 @@
             </div>
             <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-bs-parent="#accordion">
               <div class="card-body">
-                <p class="card-text">'birth_preparedness': spent 3 min compared to average of 22 min <strong>[Very Surprising]</strong>.</p>
-                <p class="card-text">'delivery_check': spent 13 min compared to previous 17 min <strong>[Little Surprising]</strong>.</p>
-                <p class="card-text">'birthday_visit': spent 4 min compared to previous 2 min <strong>[Not Surprising]</strong>.</p>
+                <h5 class="card-title">What method was suggested for family planning?</h5>
+                <p class="card-text">The CHW spent 3 min compared to average of 22 min <strong>[Very Surprising]</strong>.</p>
+                <h5 class="card-title">What implant type was used?</h5>
+                <p class="card-text">The CHW spent 13 min compared to previous 17 min <strong>[Surprising]</strong>.</p>
+                <h5 class="card-title">Was a Family Planning referral made?</h5>
+                <p class="card-text">The CHW spent 4 min compared to previous 2 min <strong>[Surprising]</strong>.</p>
               </div>
               <div class="card-footer">
-                April - July
+                April 2021 - July 2021
               </div>
             </div>
           </div>
@@ -106,7 +112,7 @@
             <div class="card-header text-white bg-success" id="headingThree">
               <h6 class="mb-0 align-left">
                 <button class="btn btn-link collapsed" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                  CHW Activity Times ▼
+                  CHW Activity Times <span id='arrowThree'>▼</span>
                 </button>
               </h6>
               <h7 class="align-right">
@@ -115,7 +121,13 @@
             </div>
             <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-bs-parent="#accordion">
               <div class="card-body">
-                <img class="card-img-bottom" src="chart1.png" alt="CHW Activity Times">
+                <h5 class="card-title">What method was suggested for family planning?</h5>
+                <p class="card-text">The CHW spent 3 min compared to average of 22 min <strong>[Very Surprising]</strong>.</p>
+                <h5 class="card-title">What implant type was used?</h5>
+                <p class="card-text">The CHW spent 13 min compared to previous 17 min <strong>[Surprising]</strong>.</p>
+                <h5 class="card-title">Was a Family Planning referral made?</h5>
+                <p class="card-text">The CHW spent 4 min compared to previous 2 min <strong>[Surprising]</strong>.</p>
+                <!-- <img class="card-img-bottom" src="chart1.png" alt="CHW Activity Times"> -->
               </div>
             </div>
           </div>
@@ -128,7 +140,7 @@
             <div class="card-header text-white bg-warning" id="headingFour">
               <h6 class="mb-0 align-left">
                 <button class="btn btn-link collapsed" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-                  Data Completeness ▼
+                  Data Completeness <span id='arrowFour'>▼</span>
                 </button>
               </h6>
               <h7 class="align-right">
@@ -137,7 +149,13 @@
             </div>
             <div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-bs-parent="#accordion">
               <div class="card-body">
-                <img class="card-img-bottom" src="chart2.png" alt="Data Completeness">
+                <h5 class="card-title">What method was suggested for family planning?</h5>
+                <p class="card-text">The CHW spent 3 min compared to average of 22 min <strong>[Very Surprising]</strong>.</p>
+                <h5 class="card-title">What implant type was used?</h5>
+                <p class="card-text">The CHW spent 13 min compared to previous 17 min <strong>[Surprising]</strong>.</p>
+                <h5 class="card-title">Was a Family Planning referral made?</h5>
+                <p class="card-text">The CHW spent 4 min compared to previous 2 min <strong>[Surprising]</strong>.</p>
+                <!-- <img class="card-img-bottom" src="chart2.png" alt="Data Completeness"> -->
               </div>
             </div>
           </div>
