@@ -1,1 +1,1 @@
-document.getElementById('#arrowOne').textContent = 'tes';
+document.body.style.backgroundColor = 'blue';
