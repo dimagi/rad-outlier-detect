@@ -48,12 +48,14 @@
           <div class="card text-center mb-3">
             <div class="card-header bg-danger text-white clear-float">
               <h6 class="mb-0 align-left">
-                <button class="btn btn-link" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                <button id="btnOne" class="btn btn-link" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
                   Anomalous Behavior in Data <span id='arrowOne'>▼</span>
                 </button>
-              </h6>
+              </h6> 
               <h7 class="align-right">
-                High Priority
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
               </h7>
             </div>
             <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-bs-parent="#accordion">
@@ -76,14 +78,16 @@
       <div class="row">
         <div class="col-sm-12">
           <div class="card text-center mb-3">
-            <div class="card-header text-white bg-success">
+            <div class="card-header text-white bg-danger">
               <h6 class="mb-0 align-left">
-                <button class="btn btn-link collapsed" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                <button id="btnTwo" class="btn btn-link collapsed" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
                   Anomalous Behavior in Submission Time <span id='arrowTwo'>▼</span>
                 </button>
               </h6>
               <h7 class="align-right">
-                Low Priority
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
               </h7>
             </div>
             <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-bs-parent="#accordion">
@@ -106,14 +110,15 @@
       <div class="row">
         <div class="col-sm-12">
           <div class="card text-center mb-3">
-            <div class="card-header text-white bg-success" id="headingThree">
+            <div class="card-header text-white bg-warning" id="headingThree">
               <h6 class="mb-0 align-left">
-                <button class="btn btn-link collapsed" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                <button id="btnThree" class="btn btn-link collapsed" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
                   CHW Activity Times <span id='arrowThree'>▼</span>
                 </button>
               </h6>
               <h7 class="align-right">
-                Low Priority
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
               </h7>
             </div>
             <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-bs-parent="#accordion">
@@ -125,7 +130,7 @@
                 <h5 class="card-title">Was a Family Planning referral made?</h5>
                 <p class="card-text">The CHW spent 4 min compared to previous 2 min <strong>[Surprising]</strong>.</p>
                 <!-- <img class="card-img-bottom" src="chart1.png" alt="CHW Activity Times"> -->
-              </div>
+              </div> 
             </div>
           </div>
         </div>
@@ -134,14 +139,14 @@
       <div class="row">
         <div class="col-sm-12">
           <div class="card text-center mb-3">
-            <div class="card-header text-white bg-warning" id="headingFour">
+            <div class="card-header text-white bg-success" id="headingFour">
               <h6 class="mb-0 align-left">
                 <button class="btn btn-link collapsed" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
                   Data Completeness <span id='arrowFour'>▼</span>
                 </button>
               </h6>
               <h7 class="align-right">
-                Med Priority
+                <i class="fas fa-star"></i>
               </h7>
             </div>
             <div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-bs-parent="#accordion">
