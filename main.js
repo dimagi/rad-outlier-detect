@@ -1,4 +1,4 @@
-function toggleArrow(txt) {
+function toggleArrow(btn) {
     if(btn.innerText == '▼') {
         btn.innerText = '▲'
     } else {
@@ -6,18 +6,18 @@ function toggleArrow(txt) {
     }
 }
 
-$('#collapseOne').on('shown.bs.collapse', function () {
-    toggleArrow(this);
+$('#btnOne').click(function () {
+    toggleArrow(document.getElementById('arrowOne'));
 })
 
-$('#collapseTwo').on('shown.bs.collapse', function () {
-    toggleArrow(this);
+$('#btnTwo').click(function () {
+    toggleArrow(document.getElementById('arrowTwo'));
 })
 
-$('#collapseThree').on('shown.bs.collapse', function () {
-    toggleArrow(this);
+$('#btnThree').click(function () {
+    toggleArrow(document.getElementById('arrowThree'));
 })
 
-$('#collapseFour').on('shown.bs.collapse', function () {
-    toggleArrow(this)
-});
+$('#btnFour').click(function () {
+    toggleArrow(document.getElementById('arrowFour'));
+})
